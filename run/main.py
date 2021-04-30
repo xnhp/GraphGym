@@ -20,8 +20,16 @@ from graphgym.contrib.train import *
 from graphgym.register import train_dict
 
 if __name__ == '__main__':
+
+    import os
+
+    print(os.environ['PYTHONPATH'])
+
     # Load cmd line args
     args = parse_args()
+
+    repeats = args.repeat if args.repeat > cfg.dataset.repeat else cfg.dataset.repeat
+
     # Repeat for different random seeds
     for i in range(args.repeat):
         # Load config file
@@ -39,11 +47,21 @@ if __name__ == '__main__':
         dump_cfg(cfg)
         setup_printing()
         auto_select_device()
+        print("using device " + str(cfg.device))
         # Set learning environment
         datasets = create_dataset()
+        # create a loader for train split and for any other defined splits
         loaders = create_loader(datasets)
+        # create a logger for each loader, i.e. report metrics on train/test/val splits
         meters = create_logger(datasets, loaders)
-        model = create_model(datasets)
+        # todo: for unsupervised case, specify dim_out explicitly since we do not have
+        #   labels to infer shape from. Do this via config.
+        if cfg.dataset.task_type == 'community':
+            # in unsupervised case, need to specify output dimensionality explicitly
+            # since we do not have labels to infer from
+            model = create_model(datasets, dim_out=cfg.dataset.num_communities)
+        else:
+            model = create_model(datasets)
         optimizer = create_optimizer(model.parameters())
         scheduler = create_scheduler(optimizer)
         # Print model info
