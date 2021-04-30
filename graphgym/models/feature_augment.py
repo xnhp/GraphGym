@@ -1,16 +1,13 @@
 import logging
+
+import graphgym.register as register
 import networkx as nx
 import numpy as np
 import torch
 import torch.nn as nn
-
 from deepsnap.graph import Graph
-
 from graphgym.config import cfg
 from graphgym.contrib.transform.identity import compute_identity
-
-from graphgym.contrib.feature_augment import *
-import graphgym.register as register
 
 
 def _key(key, as_label=False):
@@ -255,6 +252,9 @@ class FeatureAugment(nn.Module):
         else:
             repr_method = cfg.dataset.augment_feature_repr
         actual_feat_dims = []
+        # NOTE, TODO, BUG: you necessarily need to specify one value for each augment
+        # in cfg.dataset.augment_feature_dims; else the `zip` here does not contain all
+        # features
         for key, dim in zip(features, feature_dims):
             feat_fun = self.feature_dict[key]
             key = key + '_label' if as_label else key
@@ -264,7 +264,7 @@ class FeatureAugment(nn.Module):
                     feat_fun,
                     update_graph=False, update_tensor=False,
                     as_label=as_label, feature_dim=dim)
-                feat = dataset[0][key]
+                feat = dataset[0][key]  # computed features
                 if repr_method == 'original':
                     # use the original feature as is
                     # this ignores the specified config feature_dims
