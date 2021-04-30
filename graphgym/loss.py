@@ -6,7 +6,8 @@ from graphgym.contrib.loss import *
 import graphgym.register as register
 from graphgym.config import cfg
 
-def compute_loss(pred, true):
+
+def compute_loss(pred, true, batch=None):
     '''
 
     :param pred: unnormalized prediction
@@ -26,10 +27,9 @@ def compute_loss(pred, true):
 
 
     # Try to load customized loss
-    for func in register.loss_dict.values():
-        value = func(pred, true)
-        if value is not None:
-            return value
+    for key in register.loss_dict:
+        if key == cfg.model.loss_fun:
+            return register.loss_dict[key](pred, true, batch=batch)
 
     if cfg.model.loss_fun == 'cross_entropy':
         # multiclass
