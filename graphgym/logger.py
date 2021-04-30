@@ -1,12 +1,11 @@
-import torch
+import logging
 import math
 import os
 import sys
-import logging
+
+import torch
 from graphgym.config import cfg
 from graphgym.utils.io import dict_to_json, dict_to_tb
-import pdb
-
 from sklearn.metrics import *
 from tensorboardX import SummaryWriter
 
@@ -63,6 +62,8 @@ class Logger(object):
         self._iter = 0
         self._size_current = 0
         self._loss = 0
+        self._loss_main = 0
+        self._loss_reg = 0
         self._lr = 0
         self._params = 0
         self._time_used = 0
@@ -107,6 +108,39 @@ class Logger(object):
                     round(math.sqrt(mean_squared_error(true, pred)), cfg.round))
                 }
 
+    def community_metrics(self, loader):
+        # NOTE `pred` here is pred_score as determined by the invokation of the loss
+        # method (see train.py)
+        r = {}
+        mod = self._loss_main * -1
+        reg = self._loss_reg
+        r['modularity'] = mod
+        r['regularisation'] = reg
+        # erroneous
+        # dont need to recompute modularity since now we pass it directly from loss
+        # computation
+        pred = self._pred[-1]
+        batch = next(loader._get_iterator())
+        # # hack, in case we simply invoke baseline, `pred` is the partition (nested
+        # # lists of node ids)
+        if isinstance(pred[0], frozenset):
+            # assumes pred to be output of nx algorithm, i.e. list of frozensets of node ids
+            r['community_sizes'] = [len(s) for s in pred]
+            # pred_onehot = torch.tensor(partition_to_onehot(pred)).to(
+            #     torch.float).t().to(torch.device(cfg.device))
+            # nxG, mod, pred_score = soft_modularity_on_device(batch, pred_onehot)
+            # r['modularity'] = float(round(mod.item(), cfg.round))
+
+        if isinstance(pred[0], torch.Tensor) and loader is not None:
+            # pred is an embedding, compute modularity
+            # only need ref to batch to access ref to graph
+            r['community_sizes'] = pred.detach().cpu().sum(dim=0).numpy().tolist()
+            # pred = pred.to(torch.device(cfg.device))  # todo avoidable shifting
+            # # TODO we compute modularity twice in each epoch
+            # nxG, mod, pred_score = soft_modularity_on_device(batch, pred)
+            # r['modularity'] = float(round(mod.item(), cfg.round))
+        return r
+
     def time_iter(self):
         return self._time_used / self._iter
 
@@ -125,23 +159,30 @@ class Logger(object):
         time_per_epoch = self._time_total / epoch_current
         return time_per_epoch * (self._epoch_total - epoch_current)
 
-    def update_stats(self, true, pred, loss, lr, time_used, params):
-        assert true.shape[0] == pred.shape[0]
+    def update_stats(self, true, pred, loss, lr, time_used, params, **kwargs):
+        if true is not None and pred is not None:
+            assert true.shape[0] == pred.shape[0]
         self._iter += 1
         self._true.append(true)
         self._pred.append(pred)
-        batch_size = true.shape[0]
+        batch_size = true.shape[0] if true is not None else 1
         self._size_current += batch_size
         self._loss += loss * batch_size
         self._lr = lr
         self._params = params
         self._time_used += time_used
         self._time_total += time_used
+        try:
+            self._loss_main = kwargs['loss_main']
+            self._loss_reg = kwargs['loss_reg']
+        except KeyError:
+            pass
 
     def write_iter(self):
         raise NotImplementedError
 
-    def write_epoch(self, cur_epoch):
+    def write_epoch(self, cur_epoch, loader=None):
+        # additionally pass in loader to access graph structure for community metrics
         basic_stats = self.basic()
 
         if self.task_type == 'regression':
@@ -150,8 +191,11 @@ class Logger(object):
             task_stats = self.classification_binary()
         elif self.task_type == 'classification_multi':
             task_stats = self.classification_multi()
+        elif self.task_type == 'community':
+            # TODO code smell, these should be registered like loaders
+            task_stats = self.community_metrics(loader)
         else:
-            raise ValueError('Task has to be regression or classification')
+            raise ValueError('unknown task type')
 
         epoch_stats = {'epoch': cur_epoch}
         eta_stats = {'eta': round(self.eta(cur_epoch), cfg.round)}
@@ -173,7 +217,6 @@ class Logger(object):
     def close(self):
         if cfg.tensorboard_each_run:
             self.tb_writer.close()
-
 
 def create_logger(datasets, loaders):
     loggers = []
