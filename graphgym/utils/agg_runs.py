@@ -1,19 +1,12 @@
-import os
-import json
-import numpy as np
-import shutil
-import ast
-import pandas as pd
 import logging
+import os
 
+import numpy as np
+import pandas as pd
 from graphgym.config import cfg
 from graphgym.utils.io import dict_list_to_json, dict_list_to_tb, \
-     json_to_dict_list, makedirs_rm_exist, string_to_python, dict_to_json
+    json_to_dict_list, makedirs_rm_exist, string_to_python, dict_to_json
 from tensorboardX import SummaryWriter
-
-import pdb
-
-
 
 
 def is_seed(s):
@@ -43,7 +36,7 @@ def agg_dict_list(dict_list):
     '''default agg: mean + std'''
     dict_agg = {'epoch': dict_list[0]['epoch']}
     for key in dict_list[0]:
-        if key != 'epoch':
+        if key != 'epoch' and key != 'community_sizes':
             value = np.array([dict[key] for dict in dict_list])
             dict_agg[key] = np.mean(value).round(cfg.round)
             dict_agg['{}_std'.format(key)] = np.std(value).round(cfg.round)
@@ -55,10 +48,10 @@ def name_to_dict(run):
     for col in cols:
         try:
             key, val = col.split('=')
+            keys.append(key)
+            vals.append(string_to_python(val))
         except:
             print(col)
-        keys.append(key)
-        vals.append(string_to_python(val))
     return dict(zip(keys, vals))
 
 def rm_keys(dict, keys):
@@ -73,26 +66,37 @@ def agg_runs(dir, metric_best='auto'):
     for seed in os.listdir(dir):
         if is_seed(seed):
             dir_seed = os.path.join(dir, seed)
-
-            split = 'val'
+            best_epoch = None
+            # split = 'val'
+            split = 'train'  # hack: only consider train split for unsupervised case (the
+            # only split there is)
             if split in os.listdir(dir_seed):
                 dir_split = os.path.join(dir_seed, split)
                 fname_stats = os.path.join(dir_split, 'stats.json')
-                stats_list = json_to_dict_list(fname_stats)
+                stats_list = json_to_dict_list(fname_stats)  # read files
                 if metric_best == 'auto':
                     metric = 'auc' if 'auc' in stats_list[0] else 'accuracy'
                 else:
                     metric = metric_best
                 performance_np = np.array([stats[metric] for stats in stats_list])
                 best_epoch = stats_list[performance_np.argmax()]['epoch']
-                print(best_epoch)
+                print('best epoch:', best_epoch)
+
+            # hack to catch cases where best_epoch is not determined
+            if best_epoch is None:
+                best_epoch = 0
 
             for split in os.listdir(dir_seed):
                 if is_split(split):
                     dir_split = os.path.join(dir_seed, split)
                     fname_stats = os.path.join(dir_split, 'stats.json')
                     stats_list = json_to_dict_list(fname_stats)
-                    stats_best = [stats for stats in stats_list if stats['epoch'] == best_epoch][0]
+                    # for each split, pick the stats of the epoch which gave the best
+                    # performance on the validation split (see above)
+                    stats_best = \
+                        [stats for stats in stats_list if stats['epoch'] == best_epoch][0]
+                    # write to file
+                    dict_list_to_json([stats_best], os.path.join(dir_seed, "best.json"))
                     print(stats_best)
                     stats_list = [[stats] for stats in stats_list]
                     if results[split] is None:
