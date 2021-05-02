@@ -206,7 +206,7 @@ class Logger(object):
             stats = {**epoch_stats, **basic_stats, **task_stats}
 
         # print
-        logging.info('{}: {}'.format(self.name, stats))
+        # logging.info('{}: {}'.format(self.name, stats))
         # json
         dict_to_json(stats, '{}/stats.json'.format(self.out_dir))
         # tensorboard
