@@ -9,6 +9,11 @@ from deepsnap.graph import Graph
 from graphgym.config import cfg
 from graphgym.contrib.transform.identity import compute_identity
 
+# NOTE this import must be present to correctly register modules,
+# although IDEs may flag this as unused
+from graphgym.contrib.feature_augment import *
+import graphgym.register as register
+
 
 def _key(key, as_label=False):
     return key + '_label' if as_label else key

@@ -1,21 +1,22 @@
-import os
+import logging
 import random
+
 import numpy as np
 import torch
-import logging
-import pdb
-
 from graphgym.cmd_args import parse_args
 from graphgym.config import (cfg, assert_cfg, dump_cfg,
                              update_out_dir, get_parent_dir)
 from graphgym.loader import create_dataset, create_loader
 from graphgym.logger import setup_printing, create_logger
-from graphgym.optimizer import create_optimizer, create_scheduler
 from graphgym.model_builder import create_model
+from graphgym.optimizer import create_optimizer, create_scheduler
+from graphgym.register import train_dict
 from graphgym.train import train
 from graphgym.utils.agg_runs import agg_runs
 from graphgym.utils.comp_budget import params_count
 from graphgym.utils.device import auto_select_device
+# NOTE: this import is needed to properly register modules, even though
+# IDEs may mark it as unused
 from graphgym.contrib.train import *
 from graphgym.register import train_dict
 
@@ -73,6 +74,9 @@ if __name__ == '__main__':
         if cfg.train.mode == 'standard':
             train(meters, loaders, model, optimizer, scheduler)
         else:
+            # NOTE: the import "from graphgym.contrib.train import *" is needed
+            # to properly import train loop implementations; although an IDE
+            # may flag this import as not required
             train_dict[cfg.train.mode](
                 meters, loaders, model, optimizer, scheduler)
     # Aggregate results from different seeds
