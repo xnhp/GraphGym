@@ -20,10 +20,10 @@ def compute_loss(pred, true, batch=None):
     # default manipulation for pred and true
     # can be skipped if special loss computation is needed
     # if multi task binary classification, treat as flatten binary
-    pred = pred.squeeze(-1) if pred.ndim > 1 else pred
-    true = true.squeeze(-1) if true.ndim > 1 else true
-    if true.ndim > 1 and cfg.model.loss_fun == 'cross_entropy':
-        pred, true = torch.flatten(pred), torch.flatten(true)
+    # pred = pred.squeeze(-1) if pred.ndim > 1 else pred
+    # true = true.squeeze(-1) if true.ndim > 1 else true
+    # if true.ndim > 1 and cfg.model.loss_fun == 'cross_entropy':
+    #     pred, true = torch.flatten(pred), torch.flatten(true)
 
 
     # Try to load customized loss
