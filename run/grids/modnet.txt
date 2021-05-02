@@ -1,0 +1,48 @@
+# only switch the data that is loaded
+
+# The GNN approach optimises and outputs soft modularity whereas the greedy optimisation
+# works with crisp modularity. Given crisp assignments, the soft modularity is equal to
+# the crisp modularity.
+
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+# gnn.batchnorm batchnorm [True, False]
+
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [16,64,128]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.layers_mp layers_mp [1,2,4]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.layers_post_mp layers_post [0,1,2]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.dropout dropout [0.0,0.1,0.2]
+#
+# train.mode mode ['groundtruth']
+
+
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [16,64]
+# gnn.dropout dropout [0.2,0.5]
+# model.collapse_lam lam [0.25]
+# gnn.layers_mp layers_mp [1,2,4,6]
+# gnn.layers_post_mp layers_post [2,4]
+
+
+# favourite model so far is modnetBase-batchnorm=True-dim_inner=64-dropout=0.2-lam=0.25-layers_mp=4-layers_post=2
+gnn.batchnorm batchnorm [True]
+gnn.dim_inner dim_inner [64]
+gnn.dropout dropout [0.2]
+model.collapse_lam lam [0.25]
+gnn.layers_mp layers_mp [4]
+gnn.layers_post_mp layers_post [2]
+dataset.augment_feature feat [['node_bethe_hessian']]

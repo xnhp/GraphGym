@@ -1,0 +1,16 @@
+# The recommended basic settings for GNN
+out_dir: results_ecoli
+metric_best: modularity
+dataset:
+  format: SBML
+  interpretation: bipartite
+  name: ecoli_core_model.xml
+  task: node
+  task_type: community
+  num_communities: 16  # determined via greedy louvain
+  transductive: True  # can only generate embeddings for nodes seen during training phase
+  split: [1.0] # only trivial split
+train:
+  mode: run_alg
+model:
+  loss_fun: soft_modularity_bipartite

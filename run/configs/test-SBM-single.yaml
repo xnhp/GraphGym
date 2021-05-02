@@ -1,0 +1,42 @@
+out_dir: results
+metric_best: modularity
+device: cpu
+dataset:
+  format: SBM
+  interpretation: bipartite
+  name: ecoli_core_model.xml
+  task: node
+  task_type: community
+  num_communities: 4
+  transductive: True  # can only generate embeddings for nodes seen during training phase
+  split: [1.0] # only trivial split
+  # use default values for SBM generation for now
+  augment_feature: ['node_bethe_hessian']
+  augment_feature_dims: [1] # always needs to have same length, see feature_augment.py
+  augment_feature_repr: original
+train:
+  mode: train_with_adj
+  # batch_size: 32
+  eval_period: 20
+  ckpt_period: 100
+model:
+  type: gnn
+  loss_fun: soft_modularity_bipartite
+  # edge_decoding: dot
+  # graph_pooling: add
+gnn:
+  layers_pre_mp: 1
+  layers_mp: 2
+  layers_post_mp: 1
+  # dim_inner: 256
+  layer_type: generalconv
+  stage_type: stack
+  batchnorm: True
+  act: prelu
+  dropout: 0.0
+  agg: add
+  normalize_adj: False
+optim:
+  optimizer: adam
+  base_lr: 0.01
+  max_epoch: 3

@@ -1,0 +1,40 @@
+out_dir: results_kHSBM
+metric_best: modularity
+device: cpu
+dataset:
+  format: SBM_gen_rpt  # load a pre-generated kHSBM graph for each repetition
+  interpretation: bipartite
+  name: kHSBM # will have "-k" appended for repeat index k
+  dir: easy_4  # from where to load pre-generated graphs from
+  task: node
+  task_type: community
+  num_communities: 4  # see also config.dataset.sbm_c
+  transductive: True  # can only generate embeddings for nodes seen during training phase
+  split: [1.0] # only trivial split
+  augment_feature_dims: [1] # always needs to have same length, see feature_augment.py
+  augment_feature_repr: original
+  # use default values for SBM generation for now
+train:
+  mode: train_with_adj  # or run_alg
+  # batch_size: 32
+  eval_period: 100
+  ckpt_period: 100
+model:
+  type: gnn
+  loss_fun: soft_modularity_bipartite
+gnn:
+  layers_pre_mp: 1
+  layers_mp: 2
+  layers_post_mp: 1
+  # dim_inner: 256
+  layer_type: generalconv
+  stage_type: stack
+  batchnorm: True
+  act: prelu
+  dropout: 0.0 # or 0.1 or 0.5 or 0.8
+  agg: add
+  normalize_adj: False
+optim:
+  optimizer: adam
+  base_lr: 0.1 # or 0.1 or 0.9
+  max_epoch: 300

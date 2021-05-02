@@ -1,0 +1,95 @@
+# only switch the data that is loaded
+
+# The GNN approach optimises and outputs soft modularity whereas the greedy optimisation
+# works with crisp modularity. Given crisp assignments, the soft modularity is equal to
+# the crisp modularity.
+
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+
+# yaml based on favourite model for modnet
+# dataset.augment_feature augment [[],['node_onehot_full']]
+# dataset.use_node_feature use_feat [True,False]
+# model.collapse_lam lam [0.0,0.2,0.5,0.7]
+
+dataset.augment_feature augment [['node_onehot_full']]
+dataset.use_node_feature use_feat [True]
+model.collapse_lam lam [0.0]
+# dataset.node_attr_file attr ['ecoli-kosch/rxn-fluxes-matched.csv']
+
+
+# TODO: try hidden_dim
+# TODO. try large learn rate
+
+
+
+
+# baseline
+# train.mode mode ['run_alg']
+
+# seeing that community sizes are relatively even and
+# we get a top-performing modularity with lam=0.2, lets try none
+# dim_inner = 128 picked since that was best performing model with low lambda
+# also experiment with learn rate because why not
+# dataset.augment_feature feat [['node_onehot_full']]
+# optim.base_lr lr [0.1,0.3,0.5,1.2]
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [128]
+# gnn.dropout dropout [0.2]
+# model.collapse_lam lam [0.0]
+# gnn.layers_pre_mp layers_pre [0]
+# gnn.layers_mp layers_mp [4]
+# gnn.layers_post_mp layers_post [2]
+
+# TODO: assess effect of node features
+# dataset.use_node_feature [True,False]
+# optim.base_lr lr [0.1]
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [64,128]
+# gnn.dropout dropout [0.2]
+# model.collapse_lam lam [0.2,0.5,0.7,1.0]
+# gnn.layers_pre_mp layers_pre [0]
+# gnn.layers_mp layers_mp [4]
+# gnn.layers_post_mp layers_post [2]
+
+
+
+# gnn.batchnorm batchnorm [True, False]
+
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [16,64,128]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.layers_mp layers_mp [1,2,4]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.layers_post_mp layers_post [0,1,2]
+#
+# model.collapse_lam lam [0.25]
+# gnn.batchnorm batchnorm [True]
+# gnn.dropout dropout [0.0,0.1,0.2]
+#
+# train.mode mode ['groundtruth']
+
+
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [16,64]
+# gnn.dropout dropout [0.2,0.5]
+# model.collapse_lam lam [0.25]
+# gnn.layers_mp layers_mp [1,2,4,6]
+# gnn.layers_post_mp layers_post [2,4]
+
+
+# favourite model so far is modnetBase-batchnorm=True-dim_inner=64-dropout=0.2-lam=0.25-layers_mp=4-layers_post=2
+# gnn.batchnorm batchnorm [True]
+# gnn.dim_inner dim_inner [64]
+# gnn.dropout dropout [0.2]
+# model.collapse_lam lam [0.25]
+# gnn.layers_mp layers_mp [4]
+# gnn.layers_post_mp layers_post [2]

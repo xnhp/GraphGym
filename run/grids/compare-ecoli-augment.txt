@@ -1,0 +1,17 @@
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+# as of now, always have one-hot features (see loader)
+dataset.augment_feature augment [[],['node_laplacian_eigenvalues']]
+# in `compare-ecoli`, higher learn rate performed best
+optim.base_lr lr [1.2]
+# should visualise loss...
+optim.max_epoch epoch [800]
+# did not seem to matter at all. We have very unbalanced communities anyways
+model.collapse_lam collapse_lam [0.0]
+# said to help against local mini in DMoN paper
+gnn.dropout dropout [0.0,0.15]
+
+

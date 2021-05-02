@@ -1,0 +1,27 @@
+# grid file for modularity-base.yaml
+
+# compare average achieved modularity across ´repeat` many pre-generated
+# k-HSBM graphs (same for all methods/algorithms).
+
+# The GNN approach optimises and outputs soft modularity whereas the greedy optimisation
+# works with crisp modularity. Given crisp assignments, the soft modularity is equal to
+# the crisp modularity.
+
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+train.mode mode ['train_with_adj']
+dataset.format format ['SBM_gen_rpt']
+dataset.name dataset ['kHSBM']
+dataset.task task ['node']
+dataset.transductive trans [True]
+dataset.repeat repeat [1]
+# high learn rate proved beneficial in early experiments
+optim.base_lr lr [0.1]
+# potentially depends on learn rate
+optim.max_epoch epoch [400]
+model.collapse_lam collapse_lam [0.1,0.5,0.8]
+
+

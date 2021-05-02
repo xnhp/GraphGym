@@ -1,0 +1,43 @@
+dataset:
+  augment_feature:
+  - node_bethe_hessian
+  augment_feature_dims:
+  - 1
+  augment_feature_repr: original
+  dir: associative_n=400_k=5
+  format: modnet
+  interpretation: single
+  name: pregen-modnet-graph
+  num_communities: 5
+  split:
+  - 1.0
+  task: node
+  task_type: community
+  transductive: true
+device: cpu
+gnn:
+  act: prelu
+  agg: add
+  batchnorm: true
+  dim_inner: 64
+  dropout: 0.2
+  layer_type: generalconv
+  layers_mp: 4
+  layers_post_mp: 2
+  layers_pre_mp: 0
+  normalize_adj: false
+  stage_type: stack
+metric_best: modularity
+model:
+  collapse_lam: 0.25
+  loss_fun: soft_modularity_bipartite
+  type: gnn
+optim:
+  base_lr: 0.1
+  max_epoch: 300
+  optimizer: adam
+out_dir: results_modnet\modnetBase_grid_modnet
+train:
+  ckpt_period: 100
+  eval_period: 100
+  mode: train_with_adj

@@ -1,0 +1,11 @@
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+optim.base_lr lr [0.4,0.8,1.2]
+# potentially depends on learn rate
+optim.max_epoch epoch [400]
+model.collapse_lam collapse_lam [0.1,0.5,0.8]
+
+

@@ -1,0 +1,33 @@
+out_dir: results_iJR904
+metric_best: modularity
+device: cpu
+dataset:
+  format: SBML
+  interpretation: metab_graph
+  name: ecoli-kosch/iJR904.xml
+  node_attr_file: ecoli-kosch/mtb-centr-matched.csv
+  task: node
+  task_type: community  # should rewrite so we dont need this
+  num_communities: 30  # should not matter
+  transductive: True  # can only generate embeddings for nodes seen during training phase
+  split: [1.0] # only trivial split
+  # augment_feature: ['node_onehot_full']
+  # augment_feature_repr: original  # causes augment_feature_dims to be ignored?
+  max_node_degree: 15
+  max_edge_degree: 20
+train:
+  mode: train_with_adj  # or run_alg
+  # batch_size: 32
+  eval_period: 100
+  ckpt_period: 100
+model:
+  size_average: sum
+  type: example
+  loss_fun: mse
+  collapse_lam: 0.0
+  # edge_decoding: dot
+  # graph_pooling: add
+optim:
+  optimizer: adam # ??
+  base_lr: 0.01
+  max_epoch: 1500  # modnet: 150

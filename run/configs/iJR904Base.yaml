@@ -1,0 +1,47 @@
+out_dir: results_iJR904
+metric_best: modularity
+device: cpu
+dataset:
+  format: SBML
+  interpretation: reaction_graph
+  name: ecoli-kosch/iJR904.xml
+  node_attr_file: ecoli-kosch/rxn-fluxes-matched.csv
+  task: node
+  task_type: community
+  num_communities: 30
+  transductive: True  # can only generate embeddings for nodes seen during training phase
+  split: [1.0] # only trivial split
+  augment_feature: ['node_onehot_full']
+  augment_feature_repr: original  # causes augment_feature_dims to be ignored?
+  max_node_degree: 15
+  max_edge_degree: 20
+#  augment_label: node_clustering_coefficient
+#  augment_label_dims: 10
+  # transform: ego
+train:
+  mode: train_with_adj  # or run_alg
+  # batch_size: 32
+  eval_period: 100
+  ckpt_period: 100
+model:
+  type: gnn
+  loss_fun: soft_modularity_bipartite
+  collapse_lam: 0.0
+  # edge_decoding: dot
+  # graph_pooling: add
+gnn:
+  layers_pre_mp: 0  # like in modnet
+  layers_mp: 4  # like in modnet
+  layers_post_mp: 2  # like in modnet
+  dim_inner: 128  # like in modnet
+  layer_type: generalconv
+  stage_type: stack
+  batchnorm: True
+  act: prelu
+  dropout: 0.2
+  agg: add  # ?? what are the options?
+  normalize_adj: False # ??
+optim:
+  optimizer: adam # ??
+  base_lr: 0.1  # like in modnet
+  max_epoch: 300  # modnet: 150
