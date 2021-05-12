@@ -3,6 +3,7 @@ metric_best: modularity
 device: cpu
 dataset:
   format: SBML
+  repeat: 1
   interpretation: reaction_graph
   name: ecoli-kosch/iJR904.xml
   node_attr_file: ecoli-kosch/rxn-fluxes-matched.csv
@@ -13,11 +14,9 @@ dataset:
   split: [1.0] # only trivial split
   augment_feature: ['node_onehot_full']
   augment_feature_repr: original  # causes augment_feature_dims to be ignored?
+  augment_feature_dims: [1]
   max_node_degree: 15
   max_edge_degree: 20
-#  augment_label: node_clustering_coefficient
-#  augment_label_dims: 10
-  # transform: ego
 train:
   mode: train_with_adj  # or run_alg
   # batch_size: 32
