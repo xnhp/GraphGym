@@ -1,36 +1,30 @@
-out_dir: results_modnet
+out_dir: results_modnet_pub
 metric_best: modularity
-device: cpu
+device: cpu # gpu works but does not provide advantage on my setup
 dataset:
-  format: modnet  # load a pre-generated kHSBM graph for each repetition
+  format: modnet  # instructs GG to use the proper loader for modnet graphs
   interpretation: single
   name: pregen-modnet-graph  # does not matter here
   dir: associative_n=400_k=5  # from where to load pre-generated graphs from
   task: node
   task_type: community
-  num_communities: 5  # see also config.dataset.sbm_c
+  num_communities: 5  # see parameter k in dataset.dir
   transductive: True  # can only generate embeddings for nodes seen during training phase
   split: [1.0] # only trivial split
-  augment_feature: ['node_onehot_full']
-  augment_feature_dims: [1] # always needs to have same length, see feature_augment.py
+  augment_feature_dims: [1]
   augment_feature_repr: original
-  # use default values for SBM generation for now
 train:
-  mode: train_with_adj  # or run_alg
-  # batch_size: 32
+  mode: train_with_adj  
   eval_period: 100
   ckpt_period: 100
 model:
   type: gnn
   loss_fun: soft_modularity_bipartite
   collapse_lam: 0.0
-  # edge_decoding: dot
-  # graph_pooling: add
 gnn:
-  layers_pre_mp: 0  # like in modnet
-  layers_mp: 2  # like in modnet
-  layers_post_mp: 1  # like in modnet
-  # dim_inner: 50  # like in modnet
+  layers_pre_mp: 0  # like in original modnet publication
+  layers_mp: 2  # like in original modnet publication
+  layers_post_mp: 1  # like in original modnet publication
   layer_type: generalconv
   stage_type: stack
   batchnorm: False
