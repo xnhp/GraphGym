@@ -81,8 +81,9 @@ def rxn_csv(format, name, dataset_dir):
         nw = nw.limit_node_degrees(cfg.dataset.max_node_degree)
     if cfg.dataset.max_edge_degree is not None:
         nw = nw.limit_edge_degrees(cfg.dataset.max_edge_degree)
-    nw = nw.to_rxn_graph()  # returns an igraph.Graph instead of a
+    nw = nw.limit_to_largest_component()  # returns igraph.Graph instead of
     # biomodels.Network
+    nw = nw.bipartite_projection(which=Network.hyperedge_t)
 
     import csv
     csv_path = files('data').joinpath(cfg.dataset.node_attr_file)
@@ -111,6 +112,7 @@ def rxn_csv(format, name, dataset_dir):
     # TODO select only nodes which have features set,
     #   or simply save their ids in the loop above
     nw_sub = nw.induced_subgraph(nw.vs.select(has_feature=True))  # list of node ids
+    # nw_sub = nw
 
     dsG = deepsnap.graph.Graph(nw_sub.to_networkx())
     return [dsG]
@@ -167,7 +169,8 @@ def mtb_csv(format, name, dataset_dir):
     # consider the induced subgraph of those reactions with non-zero features
     # TODO select only nodes which have features set,
     #   or simply save their ids in the loop above
-    nw_sub = nw.induced_subgraph(nw.vs.select(has_feature=True))  # list of node ids
+    # nw_sub = nw.induced_subgraph(nw.vs.select(has_feature=True))  # list of node ids
+    nw_sub = nw
 
     dsG = deepsnap.graph.Graph(nw_sub.to_networkx())
     return [dsG]
