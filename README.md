@@ -5,7 +5,7 @@ The changes made on top of the original framework can be viewed in the commit hi
 The most notable changes are:
 
 * Adjust the pipeline to unsupervised learning, in particular make adjustments s.t. ground-truth labels are not always expected
-* Integrate the soft modularity as a loss function (eq. 2)
+* Integrate the soft modularity as a loss function (eq. 2 in report)
 * Implement additional feature augmentations:
   - One-hot
   - Bethe-Hessian
