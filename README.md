@@ -5,6 +5,7 @@ The changes made on top of the original framework can be viewed in the commit hi
 The most notable changes are:
 
 * Adjust the pipeline to unsupervised learning, in particular make adjustments s.t. ground-truth labels are not always expected
+* Integrate the soft modularity as a loss function (eq. 2)
 * Implement additional feature augmentations:
   - One-hot
   - Bethe-Hessian
@@ -13,7 +14,6 @@ The most notable changes are:
   - from `SBML` files
   - pre-generated `networkx` graphs given in `.npy` format
   - pre-generated `networkx` graphs given in `.gpickle` format
-* Integrate the soft modularity as a loss function
 * Add custom training modules (training loops)
   - additionally provide information of graph to loss function in order to compute modularity
   - do not train anything but invoke a baseline algorithm
